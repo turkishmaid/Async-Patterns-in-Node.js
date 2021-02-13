@@ -1,5 +1,6 @@
-const fs = require('fs');
-const datafile = 'server/data/clothing.json';
+const fs = require('fs')
+const fsp = require("fs").promises
+const datafile = 'server/data/clothing.json'
 
 function returnsAPromise() {
     return new Promise((resolve, reject) => {
@@ -38,7 +39,7 @@ async function getDataAsync() {
     console.log("in getDataAsync()")
     // await unpacks Promise
     let rawData = await returnsAPromise();
-    data = JSON.parse(rawData.toString())
+    let data = JSON.parse(rawData.toString())
     console.log(`out getDataAsync(): a ${data.constructor.name} of length ${data.length}`)
     return data
 }
@@ -48,4 +49,35 @@ getDataAsync()
     .catch(err => console.error(err))
 
 
-let hurz = 17
+
+
+
+// asymc wraps in Promise
+async function getDataDirect() {
+    console.log("in getDataDirect()")
+    // await unpacks Promise
+    let rawData = await fsp.readFile(datafile)
+    let data = JSON.parse(rawData.toString())
+    console.log(`out getDataDirect(): a ${data.constructor.name} of length ${data.length}`)
+    return data
+}
+
+// asymc wraps in Promise
+async function getDataDirect1() {
+    console.log("in getDataDirect()")
+    // await unpacks Promise
+    let rawData = await fsp.readFile(datafile)
+    return JSON.parse(rawData.toString("utf-8"))
+}
+
+// asymc wraps in Promise
+async function getDataDirect2() {
+    console.log("in getDataDirect()")
+    // await unpacks Promise
+    return JSON.parse((await fsp.readFile(datafile)).toString("utf-8"))
+}
+
+getDataDirect2()
+    .then(a => console.log("getDataDirect ->", a))
+    .catch(err => console.error(err))
+
