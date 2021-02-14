@@ -1,21 +1,28 @@
 const express = require('express');
 const fs = require('fs');
+const fsp = require("fs").promises
 const datafile = 'server/data/clothing.json';
 const router = express.Router();
 
-function getClothingData() {
+let hurz = "nix"
 
-    return new Promise((resolve, reject) => {
-        fs.readFile(datafile, (err, data) => {
-            if (err) {
-                reject(err)
-            } else {
-                let clothingData = JSON.parse(data.toString("utf-8"));
-                resolve(clothingData)
-            }
-        })
-    })
+// asymc wraps in Promise
+async function getClothingData() {
+    // 4. await
+    let rawData = await fsp.readFile(datafile)  // await unpacks Promise
+    return JSON.parse(rawData.toString("utf-8"))
 
+    // 3. Promis
+    // return new Promise((resolve, reject) => {
+    //     fs.readFile(datafile, (err, data) => {
+    //         if (err) {
+    //             reject(err)
+    //         } else {
+    //             let clothingData = JSON.parse(data.toString("utf-8"));
+    //             resolve(clothingData)
+    //         }
+    //     })
+    // })
 }
 
 /* GET all clothing */
@@ -25,17 +32,20 @@ router.route('/')
         getClothingData()
             // 1st
             .then(data => {
+                hurz = "then"
                 console.log("serving clothing data")
                 res.send(data)
             })
-            // 3rd
+            // 3rd -> nein, 2nd -- nur die Ausgabe erfolgt verspätet
             .catch(err => {
+                hurz = "catch"
                 console.error(err)
-                res.status(500).send(err)
+                //res.status(500).send(err)  <-- don't do that. Not even in trainings.
+                res.status(500).send("Sorry.")
             })
             // 2nd
             .finally(() => {
-                console.log("finally done")
+                console.log(`finally done. ${hurz}`)  // druckt im Fehlerfall "catch"
             })
 
         // 2. callback
